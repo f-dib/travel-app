@@ -5,8 +5,18 @@ export default {
 </script>
 
 <template>
-  <h1>ciao</h1>
+      <div class="top-nav">
+          <h4>Home</h4>
+          <h4><i class="fa-solid fa-user"></i></h4>
+      </div>
 </template>
 
 <style lang="scss">
+    .top-nav{
+      height: 10vh;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background-color: aqua;
+    }
 </style>
