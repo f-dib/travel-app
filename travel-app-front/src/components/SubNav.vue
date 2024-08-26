@@ -6,7 +6,11 @@ export default {
 
 <template>
     <div class="sub-nav">
-        <i class="fa-solid fa-plus"></i>
+        <router-link :to="{name: 'trip' }">
+            <div class="border border-1 border-black px-1 rounded-5">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+        </router-link>
     </div>
 </template>
 
@@ -16,6 +20,6 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: aqua;
+        border-top: 1px solid black;
     }
 </style>

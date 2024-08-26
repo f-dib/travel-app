@@ -37,8 +37,4 @@ export default {
 </template>
 
 <style lang="scss">
-.mid-section{
-    height: 80vh;
-    overflow-y: auto;
-}
 </style>

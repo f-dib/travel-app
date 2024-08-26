@@ -7,6 +7,7 @@ class Trip {
     public $title;
     public $description;
     public $start_date;
+    public $cover;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -63,17 +64,35 @@ class Trip {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function create() {
-        $query = "INSERT INTO " . $this->table_name . " (title, description) VALUES (:title, :description)";
+    public function create()
+    {
+        $query = "INSERT INTO " . $this->table_name . " (title, description, start_date, cover) VALUES (:title, :description, :start_date, :cover)";
+
         $stmt = $this->conn->prepare($query);
+
         $stmt->bindParam(':title', $this->title);
         $stmt->bindParam(':description', $this->description);
-        $stmt->bindParam(':start_date', $this->start_date);
-        if ($stmt->execute()) {
-            $this->id = $this->conn->lastInsertId();
-            return true;
+        if (empty($this->start_date)) {
+            $stmt->bindValue(':start_date', null, PDO::PARAM_NULL);
+        } else {
+            $stmt->bindParam(':start_date', $this->start_date);
         }
-        return false;
+        $stmt->bindParam(':cover', $this->cover);
+
+        try {
+            if ($stmt->execute()) {
+                $this->id = $this->conn->lastInsertId();
+                return true;
+            } else {
+                // Log dell'errore SQL se l'inserimento fallisce
+                error_log('SQL Error: ' . implode(" ", $stmt->errorInfo()));
+                return false;
+            }
+        } catch (PDOException $e) {
+            // Log dell'eccezione se si verifica un errore durante l'esecuzione
+            error_log('PDOException: ' . $e->getMessage());
+            return false;
+        }
     }
 
     public function update() {

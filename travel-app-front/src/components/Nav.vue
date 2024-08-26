@@ -5,7 +5,7 @@ export default {
 </script>
 
 <template>
-      <div class="top-nav">
+      <div class="top-nav px-5">
           <h4>Home</h4>
           <h4><i class="fa-solid fa-user"></i></h4>
       </div>
@@ -15,8 +15,7 @@ export default {
     .top-nav{
       height: 10vh;
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
       align-items: center;
-      background-color: aqua;
     }
 </style>

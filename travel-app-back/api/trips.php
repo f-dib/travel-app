@@ -2,10 +2,25 @@
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Content-Type: application/json");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+
 include_once '../config/db.php';  // Collegamento al database
 include_once '../models/Trip.php';  // Collegamento al modello Trip
 
+if ($db === null) {
+    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
+    exit;
+}
+
 $trip = new Trip($db);
+
+$data = json_decode(file_get_contents('php://input'), true);
+
+// Logga il contenuto grezzo
+error_log('Raw data received: ' . file_get_contents('php://input'));
+
+// Logga il JSON decodificato
+error_log('Decoded data: ' . print_r($data, true));
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
@@ -18,35 +33,32 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
 
     case 'POST':
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!empty($data['title']) && !empty($data['description'])) {
-            $trip->title = $data['title'];
-            $trip->description = $data['description'];
-            $trip->start_date = $data['start_date'];
-            if ($trip->create()) {
-                echo json_encode(['success' => true, 'trip_id' => $trip->id]);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Errore durante la creazione del viaggio.']);
-            }
+        if (!isset($data['title'], $data['description'], $data['start_date'], $data['cover'])) {
+            echo json_encode(['success' => false, 'message' => 'Campi mancanti']);
+            exit;
+        }
+        $trip->title = $data['title'];
+        $trip->description = $data['description'];
+        $trip->start_date = $data['start_date'];
+        $trip->cover = $data['cover'];
+        if ($trip->create()) {
+            echo json_encode(['success' => true, 'trip_id' => $trip->id]);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Dati mancanti per creare il viaggio.']);
+            echo json_encode(['success' => false]);
         }
         break;
 
     case 'PUT':
         $data = json_decode(file_get_contents('php://input'), true);
-        if (!empty($data['id']) && !empty($data['title']) && !empty($data['description'])) {
-            $trip->id = $data['id'];
-            $trip->title = $data['title'];
-            $trip->description = $data['description'];
-            $trip->start_date = $data['start_date'];
-            if ($trip->update()) {
-                echo json_encode(['success' => true]);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Errore durante l\'aggiornamento del viaggio.']);
-            }
+        $trip->id = $data['id'];
+        $trip->title = $data['title'];
+        $trip->description = $data['description'];
+        $trip->start_date = $data['start_date'];
+        $trip->cover = $data['cover'];
+        if ($trip->update()) {
+            echo json_encode(['success' => true]);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Dati mancanti per aggiornare il viaggio.']);
+            echo json_encode(['success' => false]);
         }
         break;
 
@@ -56,10 +68,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
             if ($trip->delete()) {
                 echo json_encode(['success' => true]);
             } else {
-                echo json_encode(['success' => false, 'message' => 'Errore durante la cancellazione del viaggio.']);
+                echo json_encode(['success' => false]);
             }
-        } else {
-            echo json_encode(['success' => false, 'message' => 'ID non specificato.']);
         }
         break;
 
