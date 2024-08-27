@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage.vue";
 import TripForm from "./pages/TripForm.vue";
 import SingleTrip from "./pages/SingleTrip.vue";
 import SingleDay from "./pages/SingleDay.vue";
+import SingleStage from "./pages/SingleStage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -27,6 +28,11 @@ const router = createRouter({
       path: '/days/:id',
       name:'singleday',
       component: SingleDay
+    },
+    {
+      path: '/stages/:id',
+      name:'singlestage',
+      component: SingleStage
     },
   ],
 });

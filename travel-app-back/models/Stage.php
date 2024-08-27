@@ -5,6 +5,7 @@ class Stage {
 
     public $id;
     public $day_id;
+    public $stage_number;
     public $title;
     public $description;
     public $location;
@@ -43,6 +44,7 @@ class Stage {
         $query = "INSERT INTO " . $this->table_name . " (day_id, title, description, location, latitude, longitude, image) VALUES (:day_id, :title, :description, :location, :latitude, :longitude, :image)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':day_id', $this->day_id);
+        $stmt->bindParam(':stage_number', $this->stage_number);
         $stmt->bindParam(':title', $this->title);
         $stmt->bindParam(':description', $this->description);
         $stmt->bindParam(':location', $this->location);
@@ -61,6 +63,7 @@ class Stage {
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $this->id);
         $stmt->bindParam(':day_id', $this->day_id);
+        $stmt->bindParam(':stage_number', $this->stage_number);
         $stmt->bindParam(':title', $this->title);
         $stmt->bindParam(':description', $this->description);
         $stmt->bindParam(':location', $this->location);

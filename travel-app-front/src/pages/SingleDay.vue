@@ -16,6 +16,8 @@ export default {
     created() {
         this.store.dayId = this.$route.params.id; 
         console.log(this.store.dayId)
+        localStorage.setItem('currentTripId', this.currentTrip)
+        localStorage.setItem('currentDayId', this.store.dayId)
         // localStorage.getItem('currentTripId') 
         axios.get('http://localhost/travel-app/travel-app-back/api/trips.php?id=' + this.currentTrip + '&day=' + this.store.dayId).then(res => {
 
@@ -36,7 +38,7 @@ export default {
     <section class="mid-section">
         <div class="container-md py-4">
             <div class="d-flex gap-3">
-                <Day v-for="day in singletrip.days" :day="day"></Day>
+                <Stage v-for="stage in singleday.stages" :stage="stage"></Stage>
             </div>
         </div>
     </section>
