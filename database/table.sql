@@ -17,6 +17,7 @@ CREATE TABLE days (
 CREATE TABLE stages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     day_id INT,
+    stage_number INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
     location VARCHAR(255),

@@ -56,6 +56,22 @@ class Trip {
         return $days;
     }
 
+    public function getDayByTripId($trip_id, $day_number)
+    {
+        $query = "SELECT * FROM days WHERE trip_id = :trip_id AND day_number = :day_number";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':trip_id', $trip_id);
+        $stmt->bindParam(':day_number', $day_number);
+        $stmt->execute();
+        $day = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($day) {
+            $day['stages'] = $this->getStages($day['id']);
+        }
+
+        return $day;
+    }
+
     private function getStages($day_id) {
         $query = "SELECT * FROM stages WHERE day_id = :day_id";
         $stmt = $this->conn->prepare($query);

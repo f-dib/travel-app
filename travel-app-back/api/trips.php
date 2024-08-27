@@ -24,7 +24,9 @@ error_log('Decoded data: ' . print_r($data, true));
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        if (isset($_GET['id'])) {
+        if (isset($_GET['id']) && isset($_GET['day'])) {
+            $result = $trip->getDayByTripId($_GET['id'], $_GET['day']);
+        } elseif (isset($_GET['id'])) {
             $result = $trip->getById($_GET['id']);
         } else {
             $result = $trip->getAll();
