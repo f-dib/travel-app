@@ -36,21 +36,26 @@ switch ($_SERVER['REQUEST_METHOD']) {
         echo json_encode($result);
         break;
 
-    case 'POST':
-        if (!isset($data['title'], $data['description'], $data['start_date'], $data['cover'])) {
-            echo json_encode(['success' => false, 'message' => 'Campi mancanti']);
-            exit;
-        }
-        $trip->title = $data['title'];
-        $trip->description = $data['description'];
-        $trip->start_date = $data['start_date'];
-        $trip->cover = $data['cover'];
-        if ($trip->create()) {
-            echo json_encode(['success' => true, 'trip_id' => $trip->id]);
-        } else {
-            echo json_encode(['success' => false]);
-        }
-        break;
+        case 'POST':
+            if (!isset($data['title'], $data['description'], $data['start_date'], $data['cover'], $data['number_of_days'])) {
+                echo json_encode(['success' => false, 'message' => 'Campi mancanti']);
+                exit;
+            }
+            
+            // Set the properties of the Trip object
+            $trip->title = $data['title'];
+            $trip->description = $data['description'];
+            $trip->start_date = $data['start_date'];
+            $trip->cover = $data['cover'];
+            $trip->number_of_days = $data['number_of_days'];
+            
+            // Create the trip and associated days
+            if ($trip->createWithDays()) {  // Note: Assuming we have this method in the Trip class
+                echo json_encode(['success' => true, 'trip_id' => $trip->id]);
+            } else {
+                echo json_encode(['success' => false]);
+            }
+            break;
 
     case 'PUT':
         $data = json_decode(file_get_contents('php://input'), true);

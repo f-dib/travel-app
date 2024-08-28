@@ -3,7 +3,8 @@ CREATE TABLE trips (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     start_date DATE,
-    cover TEXT
+    cover TEXT,
+    number_of_days INT DEFAULT 1
 );
 
 CREATE TABLE days (

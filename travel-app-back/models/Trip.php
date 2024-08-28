@@ -8,6 +8,7 @@ class Trip {
     public $description;
     public $start_date;
     public $cover;
+    public $number_of_days;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -104,7 +105,7 @@ class Trip {
 
     public function create()
     {
-        $query = "INSERT INTO " . $this->table_name . " (title, description, start_date, cover) VALUES (:title, :description, :start_date, :cover)";
+        $query = "INSERT INTO " . $this->table_name . " (title, description, start_date, cover, number_of_days) VALUES (:title, :description, :start_date, :cover, :number_of_days)";
 
         $stmt = $this->conn->prepare($query);
 
@@ -116,6 +117,8 @@ class Trip {
             $stmt->bindParam(':start_date', $this->start_date);
         }
         $stmt->bindParam(':cover', $this->cover);
+        $stmt->bindParam(':number_of_days', $this->number_of_days);
+
 
         try {
             if ($stmt->execute()) {
@@ -129,6 +132,30 @@ class Trip {
         } catch (PDOException $e) {
             // Log dell'eccezione se si verifica un errore durante l'esecuzione
             error_log('PDOException: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function createWithDays()
+    {
+        // Insert the trip first
+        if ($this->create()) {
+            // Insert the days
+            for ($i = 1; $i <= $this->number_of_days; $i++) {
+                $current_date = date('Y-m-d', strtotime($this->start_date . ' + ' . ($i - 1) . ' days'));
+                $query = "INSERT INTO days (trip_id, day_number, date) VALUES (:trip_id, :day_number, :date)";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(':trip_id', $this->id);
+                $stmt->bindParam(':day_number', $i);
+                $stmt->bindParam(':date', $current_date);
+                if (!$stmt->execute()) {
+                    error_log('Failed to insert day: ' . implode(' ', $stmt->errorInfo()));
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            error_log('Failed to create trip: ' . implode(' ', $this->conn->errorInfo()));
             return false;
         }
     }
