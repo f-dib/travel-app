@@ -8,26 +8,39 @@ export default {
         title: "",
         description: "",
         start_date: "",
-        cover: "",
+        cover: null,
         number_of_days: 1,  // Default to 1 day
       },
     };
   },
   methods: {
+    handleFileUpload(event) {
+      this.trip.cover = event.target.files[0]; // Salva il file selezionato in this.trip.cover
+      console.log(this.trip.cover);
+    },
+
     submitForm() {
+      const formData = new FormData();
+      formData.append("title", this.trip.title);
+      formData.append("description", this.trip.description);
+      formData.append("start_date", this.trip.start_date || null);
+      formData.append("number_of_days", this.trip.number_of_days);
+
+      if (this.trip.cover) {
+        formData.append("cover", this.trip.cover); // Aggiunge il file a FormData
+      } else {
+        console.error("File non selezionato!");
+      }
+      console.log(this.trip);
+      console.log(formData);
+
       axios
         .post(
           "http://localhost/travel-app/travel-app-back/api/trips.php",
-          {
-            title: this.trip.title,
-            description: this.trip.description,
-            start_date: this.trip.start_date || null,
-            cover: this.trip.cover,
-            number_of_days: this.trip.number_of_days,  // Include the number of days
-          },
+          formData,
           {
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "multipart/form-data",
             },
           }
         )
@@ -54,7 +67,7 @@ export default {
 <template>
   <div class="container">
     <h1>Add your trip</h1>
-    <form @submit.prevent="submitForm">
+    <form @submit.prevent="submitForm" enctype="multipart/form-data">
       <!-- Existing form fields -->
       
       <div class="mb-3">
@@ -93,12 +106,12 @@ export default {
         />
       </div>
       <div class="mb-3">
-        <label for="trip-cover" class="form-label">Cover Link Image</label>
+        <label for="trip-cover" class="form-label">Cover Image</label>
         <input
-          type="text"
+          type="file"
           class="form-control"
           id="trip-cover"
-          v-model="trip.cover"
+          @change="handleFileUpload"
         />
       </div>
 

@@ -20,8 +20,29 @@ export default {
   created (){
     this.store.day_id = this.$route.params.id; 
     console.log(this.store.day_id);
+    this.fetchLastStageNumber(); 
   },
   methods: {
+    fetchLastStageNumber() {
+      // Esegui una chiamata API per ottenere l'ultimo stage_number per il giorno corrente
+      axios
+        .get(`http://localhost/travel-app/travel-app-back/api/stages.php?day_id=${this.store.day_id}`)
+        .then(response => {
+          const stages = response.data;
+          if (stages.length > 0) {
+            // Ottieni l'ultimo stage_number e incrementalo
+            const lastStageNumber = Math.max(...stages.map(stage => stage.stage_number));
+            this.stage.stage_number = lastStageNumber + 1;
+          } else {
+            // Se non ci sono stage, inizia da 1
+            this.stage.stage_number = 1;
+          }
+        })
+        .catch(error => {
+          console.error("Errore nel recuperare gli stage:", error);
+          this.stage.stage_number = 1; // Se c'è un errore, inizia da 1
+        });
+    },
     submitStage() {
         axios
             .post(
@@ -65,11 +86,6 @@ export default {
 <template>
     <div>
       <form @submit.prevent="submitStage">
-        
-        <div>
-          <label for="stage_number">Numero Stage:</label>
-          <input type="number" v-model="stage.stage_number" id="stage_number" required />
-        </div>
   
         <div>
           <label for="title">Titolo:</label>
