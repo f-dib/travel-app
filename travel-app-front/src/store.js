@@ -4,6 +4,7 @@ export const store = reactive({
 
     tripId: '',
     dayId: '',
-    stageId: ''
+    stageId: '',
+    day_id: '',
 
 });

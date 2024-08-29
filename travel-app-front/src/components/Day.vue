@@ -3,7 +3,7 @@ export default {
     name: 'Day',
     props: {
         day: Object,
-    },
+    }
 }
 </script>
 

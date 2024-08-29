@@ -41,8 +41,14 @@ class Stage {
     }
 
     public function create() {
-        $query = "INSERT INTO " . $this->table_name . " (day_id, title, description, location, latitude, longitude, image) VALUES (:day_id, :title, :description, :location, :latitude, :longitude, :image)";
+        $query = "INSERT INTO " . $this->table_name . " 
+                  (day_id, stage_number, title, description, location, latitude, longitude, image) 
+                  VALUES 
+                  (:day_id, :stage_number, :title, :description, :location, :latitude, :longitude, :image)";
+
         $stmt = $this->conn->prepare($query);
+
+        // Bind dei parametri
         $stmt->bindParam(':day_id', $this->day_id);
         $stmt->bindParam(':stage_number', $this->stage_number);
         $stmt->bindParam(':title', $this->title);
@@ -51,6 +57,8 @@ class Stage {
         $stmt->bindParam(':latitude', $this->latitude);
         $stmt->bindParam(':longitude', $this->longitude);
         $stmt->bindParam(':image', $this->image);
+
+        // Esecuzione della query
         if ($stmt->execute()) {
             $this->id = $this->conn->lastInsertId();
             return true;

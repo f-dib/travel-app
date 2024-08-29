@@ -22,7 +22,7 @@ export default {
         axios.get('http://localhost/travel-app/travel-app-back/api/trips.php?id=' + this.currentTrip + '&day=' + this.store.dayId).then(res => {
 
             this.singleday = res.data
-            console.log(this.singleday.stages)
+            console.log(this.singleday)
 
         }).catch(err => {
         console.log(err)
@@ -40,6 +40,15 @@ export default {
             <div class="d-flex gap-3">
                 <Stage v-for="stage in singleday.stages" :stage="stage"></Stage>
             </div>
+        </div>
+    </section>
+    <section>
+        <div>
+            <router-link :to="{name: 'stage', params: { id: this.singleday.id }  }">
+                <div class="border border-1 border-black px-1 rounded-5">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+            </router-link>
         </div>
     </section>
 </template>
