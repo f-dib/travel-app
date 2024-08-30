@@ -18,7 +18,7 @@ export default {
 <template>
     <router-link :to="{ name: 'singletrip', params: { id: trip.id } }">
         <div class="card text-bg-dark">
-            <img :src="getImageUrl(trip.cover)" class="card-img" alt="...">
+            <img :src="getImageUrl(trip.cover)" class="card-img" :alt="`${trip.title}`">
             <div class="card-img-overlay">
                 <h5 class="card-title">{{ trip.title }}</h5>
                 <p class="card-text">{{ trip.description }}</p>

@@ -6,6 +6,7 @@ import SingleTrip from "./pages/SingleTrip.vue";
 import SingleDay from "./pages/SingleDay.vue";
 import SingleStage from "./pages/SingleStage.vue";
 import StageForm from "./pages/StageForm.vue";
+import EditTripForm from "./pages/EditTripForm.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -39,6 +40,11 @@ const router = createRouter({
       path: '/stage-form/:id',
       name:'stage',
       component: StageForm
+    },
+    {
+      path: '/edit-trip/:id',
+      name:'edittrip',
+      component: EditTripForm
     },
   ],
 });

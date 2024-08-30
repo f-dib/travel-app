@@ -161,16 +161,86 @@ class Trip {
     }
 
     public function update() {
-        $query = "UPDATE " . $this->table_name . " SET title = :title, description = :description WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $this->id);
-        $stmt->bindParam(':title', $this->title);
-        $stmt->bindParam(':description', $this->description);
-        $stmt->bindParam(':start_date', $this->start_date);
-        return $stmt->execute();
+        try {
+            $this->conn->beginTransaction();
+    
+            $query = "UPDATE " . $this->table_name . " SET title = :title, description = :description, start_date = :start_date, cover = :cover, number_of_days = :number_of_days WHERE id = :id";
+    
+            $stmt = $this->conn->prepare($query);
+    
+            // Binding dei parametri
+            $stmt->bindParam(':id', $this->id);
+            $stmt->bindParam(':title', $this->title);
+            $stmt->bindParam(':description', $this->description);
+            $stmt->bindParam(':start_date', $this->start_date);
+            $stmt->bindParam(':cover', $this->cover);
+            $stmt->bindParam(':number_of_days', $this->number_of_days);
+    
+            if (!$stmt->execute()) {
+                error_log('SQL Error: ' . implode(" ", $stmt->errorInfo()));
+                $this->conn->rollBack();
+                return false;
+            }
+    
+            // Gestione dei giorni
+            $query = "SELECT COUNT(*) as total_days FROM days WHERE trip_id = :trip_id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':trip_id', $this->id);
+            $stmt->execute();
+            $current_days = $stmt->fetch(PDO::FETCH_ASSOC)['total_days'];
+    
+            if ($this->number_of_days > $current_days) {
+                // Aggiungi giorni
+                for ($i = $current_days + 1; $i <= $this->number_of_days; $i++) {
+                    $date = date('Y-m-d', strtotime($this->start_date . ' + ' . ($i - 1) . ' days'));
+                    $query = "INSERT INTO days (trip_id, day_number, date) VALUES (:trip_id, :day_number, :date)";
+                    $stmt = $this->conn->prepare($query);
+                    $stmt->bindParam(':trip_id', $this->id);
+                    $stmt->bindParam(':day_number', $i);
+                    $stmt->bindParam(':date', $date);
+                    if (!$stmt->execute()) {
+                        error_log('Failed to add day: ' . implode(" ", $stmt->errorInfo()));
+                        $this->conn->rollBack();
+                        return false;
+                    }
+                }
+            } elseif ($this->number_of_days < $current_days) {
+                // Rimuovi giorni
+                $query = "DELETE FROM days WHERE trip_id = :trip_id AND day_number > :day_number";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(':trip_id', $this->id);
+                $stmt->bindParam(':day_number', $this->number_of_days);
+                if (!$stmt->execute()) {
+                    error_log('Failed to delete excess days: ' . implode(" ", $stmt->errorInfo()));
+                    $this->conn->rollBack();
+                    return false;
+                }
+            }
+    
+            $this->conn->commit();
+            return true;
+    
+        } catch (Exception $e) {
+            error_log('Exception: ' . $e->getMessage());
+            $this->conn->rollBack();
+            return false;
+        }
     }
 
     public function delete() {
+        // Elimina le tappe collegate
+        $query = "DELETE FROM stages WHERE day_id IN (SELECT id FROM days WHERE trip_id = :trip_id)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':trip_id', $this->id);
+        $stmt->execute();
+    
+        // Elimina i giorni collegati
+        $query = "DELETE FROM days WHERE trip_id = :trip_id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':trip_id', $this->id);
+        $stmt->execute();
+    
+        // Infine, elimina il trip
         $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $this->id);

@@ -58,10 +58,18 @@ class Day {
         return $stmt->execute();
     }
 
-    public function delete() {
+    public function delete()
+    {
+        // Elimina tutte le tappe (stages) collegate a questo giorno
+        $query = "DELETE FROM stages WHERE day_id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $this->id);
+        $stmt->execute();
+
+        // Elimina il giorno stesso
         $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $this->id);
-        return $stmt->execute();
+        return $stmt->execute(); // Aggiunto return per indicare successo/fallimento
     }
 }

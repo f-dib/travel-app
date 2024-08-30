@@ -28,6 +28,32 @@ export default {
         console.log(err)
         });
     },
+    methods: {
+        deleteDay() {
+            if (
+                confirm(
+                "Sei sicuro di voler eliminare questo giorno? Questa azione non può essere annullata."
+                )
+            ) {
+                axios
+                .delete(
+                    "http://localhost/travel-app/travel-app-back/api/days.php?id=" +
+                    this.singleday.id
+                )
+                .then((response) => {
+                    if (response.data.success) {
+                    alert("Giorno eliminato con successo!");
+                    window.location.href = "http://localhost:5173/";
+                    } else {
+                    alert("Errore durante l'eliminazione del giorno.");
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+            }
+        },
+    },
     components: {
       Stage
     },
@@ -51,6 +77,7 @@ export default {
             </router-link>
         </div>
     </section>
+    <button @click="deleteDay" class="btn btn-danger">Elimina Giorno</button>
 </template>
 
 <style lang="scss">

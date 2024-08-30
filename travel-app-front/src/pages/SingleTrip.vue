@@ -25,6 +25,24 @@ export default {
         console.log(err)
         });
     },
+    methods: {
+        deleteTrip() {
+            if (confirm("Sei sicuro di voler eliminare questo viaggio? Questa azione non può essere annullata.")) {
+                axios.delete('http://localhost/travel-app/travel-app-back/api/trips.php?id=' + this.store.tripId)
+                .then(response => {
+                    if (response.data.success) {
+                        alert("Viaggio eliminato con successo!");
+                        window.location.href = "http://localhost:5173/";
+                    } else {
+                        alert("Errore durante l'eliminazione del viaggio.");
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+            }
+        },
+    },
     components: {
       Day
     },
@@ -39,6 +57,13 @@ export default {
             </div>
         </div>
     </section>
+    
+    <router-link :to="{ name: 'edittrip', params: { id: this.singletrip.id } }">
+        Modifica viaggio
+    </router-link>
+    
+    <!-- Pulsante per eliminare il trip -->
+    <button @click="deleteTrip">Elimina Viaggio</button>
 </template>
 
 <style lang="scss">

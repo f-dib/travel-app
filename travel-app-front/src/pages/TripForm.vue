@@ -107,6 +107,13 @@ export default {
       </div>
       <div class="mb-3">
         <label for="trip-cover" class="form-label">Cover Image</label>
+        <div v-if="trip.cover">
+          <img
+            class="m-2 w-25 rounded-3"
+            :src="`http://localhost/travel-app/travel-app-back/api/uploads/${trip.cover.name}`"
+            alt="Cover Image"
+          />
+        </div>
         <input
           type="file"
           class="form-control"
