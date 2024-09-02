@@ -48,37 +48,48 @@ switch ($_SERVER['REQUEST_METHOD']) {
     case 'POST':
         // Verifica se l'ID è presente per distinguere tra creazione e modifica
         if (isset($_POST['id']) && !empty($_POST['id'])) {
-            // Modifica di un trip esistente
-            $trip->id = $_POST['id'];
-            $trip->title = $_POST['title'];
-            $trip->description = $_POST['description'];
-            $trip->start_date = $_POST['start_date'];
-            $trip->number_of_days = $_POST['number_of_days'];
-
-            if (isset($_FILES['cover']) && $_FILES['cover']['error'] === UPLOAD_ERR_OK) {
-                $fileTmpPath = $_FILES['cover']['tmp_name'];
-                $fileName = $_FILES['cover']['name'];
-                $upload_dir = __DIR__ . '/uploads/';
-                $upload_file = $upload_dir . basename($fileName);
-
-                if (!is_dir($upload_dir)) {
-                    mkdir($upload_dir, 0777, true);
-                }
-
-                if (move_uploaded_file($fileTmpPath, $upload_file)) {
-                    $trip->cover = $fileName;
+            // Controlla se si sta aggiornando solo il numero di giorni
+            if (isset($_POST['update_days_only']) && $_POST['update_days_only'] === 'true') {
+                $trip->id = $_POST['id'];
+                $trip->number_of_days = $_POST['number_of_days'];
+                if ($trip->updateNumberOfDaysOnly()) {
+                    echo json_encode(['success' => true, 'message' => 'Number of days updated successfully']);
                 } else {
-                    echo json_encode(['success' => false, 'message' => 'Failed to upload file.']);
-                    exit;
+                    echo json_encode(['success' => false, 'message' => 'Failed to update number of days']);
                 }
             } else {
-                $trip->cover = $_POST['cover'];  // Mantieni l'immagine esistente
-            }
+                // Modifica di un trip esistente
+                $trip->id = $_POST['id'];
+                $trip->title = $_POST['title'];
+                $trip->description = $_POST['description'];
+                $trip->start_date = $_POST['start_date'];
+                $trip->number_of_days = $_POST['number_of_days'];
 
-            if ($trip->update()) {
-                echo json_encode(['success' => true, 'message' => 'Trip updated successfully']);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Failed to update trip']);
+                if (isset($_FILES['cover']) && $_FILES['cover']['error'] === UPLOAD_ERR_OK) {
+                    $fileTmpPath = $_FILES['cover']['tmp_name'];
+                    $fileName = $_FILES['cover']['name'];
+                    $upload_dir = __DIR__ . '/uploads/';
+                    $upload_file = $upload_dir . basename($fileName);
+
+                    if (!is_dir($upload_dir)) {
+                        mkdir($upload_dir, 0777, true);
+                    }
+
+                    if (move_uploaded_file($fileTmpPath, $upload_file)) {
+                        $trip->cover = $fileName;
+                    } else {
+                        echo json_encode(['success' => false, 'message' => 'Failed to upload file.']);
+                        exit;
+                    }
+                } else {
+                    $trip->cover = $_POST['cover'];  // Mantieni l'immagine esistente
+                }
+
+                if ($trip->update()) {
+                    echo json_encode(['success' => true, 'message' => 'Trip updated successfully']);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Failed to update trip']);
+                }
             }
         } else {
             // Creazione di un nuovo trip

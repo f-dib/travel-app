@@ -41,9 +41,10 @@ export default {
                     this.singleday.id
                 )
                 .then((response) => {
-                    if (response.data.success) {
-                    alert("Giorno eliminato con successo!");
-                    window.location.href = "http://localhost:5173/";
+                    if (response.data.success) { 
+                        alert("Giorno eliminato con successo!");
+                        this.updateNumberOfDays();
+                        window.location.href = "http://localhost:5173/";
                     } else {
                     alert("Errore durante l'eliminazione del giorno.");
                     }
@@ -52,6 +53,31 @@ export default {
                     console.error(error);
                 });
             }
+        },
+        updateNumberOfDays() {
+            axios.get('http://localhost/travel-app/travel-app-back/api/trips.php?id=' + this.currentTrip)
+                .then(res => {
+                    const remainingDays = res.data.days.length; // Numero di giorni rimanenti
+                    
+                    axios.post(`http://localhost/travel-app/travel-app-back/api/trips.php`, {
+                        id: this.currentTrip,
+                        number_of_days: remainingDays,
+                        update_days_only: true // Flag per indicare che si sta aggiornando solo il numero di giorni
+                    })
+                    .then(response => {
+                        if (response.data.success) {
+                            alert("Il numero di giorni è stato aggiornato con successo!");
+                        } else {
+                            alert("Errore durante l'aggiornamento del numero di giorni.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Errore durante l'aggiornamento del numero di giorni:", error);
+                    });
+                })
+                .catch(err => {
+                    console.log(err);
+                });
         },
     },
     components: {

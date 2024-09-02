@@ -246,4 +246,19 @@ class Trip {
         $stmt->bindParam(':id', $this->id);
         return $stmt->execute();
     }
+
+    public function updateNumberOfDaysOnly() {
+        $query = "UPDATE " . $this->table_name . " SET number_of_days = :number_of_days WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':number_of_days', $this->number_of_days);
+        $stmt->bindParam(':id', $this->id);
+        
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            error_log('Failed to update number of days: ' . implode(" ", $stmt->errorInfo()));
+            return false;
+        }
+    }
 }
